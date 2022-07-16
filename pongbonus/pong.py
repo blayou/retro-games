@@ -117,11 +117,11 @@ while True:
 
         if ball.y - rayonBalle <= 0:
             ball.direction_y = "DOWN"
-            ball.vitesse_y = randint(ball.vitesse_y - 1, ball.vitesse_y + 1)
+            ball.vitesse_y = randint(ball.vitesse_y, ball.vitesse_y + 2)
 
         elif ball.y + rayonBalle >= tailleFenetre:
             ball.direction_y = "UP"
-            ball.vitesse_y = randint(ball.vitesse_y - 1, ball.vitesse_y + 1)
+            ball.vitesse_y = randint(ball.vitesse_y, ball.vitesse_y + 2)
 
         if ball.x - rayonBalle <= pong_1.right:
             if ball.y - rayonBalle >= pong_1.top and ball.y + rayonBalle <= pong_1.bottom:
@@ -161,15 +161,18 @@ while True:
 
         if ball.vitesse_x < 2 :
             ball.vitesse_x = 2
-        if ball.vitesse_x > 6 :
-            ball.vitesse_x = 6
+        if ball.vitesse_x > 10 :
+            ball.vitesse_x = 10
         if ball.vitesse_y < 2 :
             ball.vitesse_y = 2
-        if ball.vitesse_y > 6 :
-            ball.vitesse_y = 6
+        if ball.vitesse_y > 10 :
+            ball.vitesse_y = 10
+        
+        
 
         ball.move()
         pygame.display.update()
+
         timer.tick(60)
     
     while game_on == False:
