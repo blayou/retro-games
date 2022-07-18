@@ -1,6 +1,7 @@
 #from doctest import NORMALIZE_WHITESPACE
 #from tkinter.tix import CELL
 #from token import TYPE_COMMENT
+from ast import Break
 import pygame
 import sys
 import random
@@ -10,10 +11,11 @@ import time
 #from requests import head
 
 record = None
-state = "END"
-score_path = str(pathlib.Path(__file__).parent.absolute()) + "\\snake\\filessnake.py"
+
+score_path = str(pathlib.Path(__file__).parent.absolute()) + "\\filessnake.py"
 score_path = score_path.replace("\\",'/')
 
+exec(open(score_path).read())
 class Block:
     def __init__(self, x_pos, y_pos):
         self.x = x_pos
@@ -124,7 +126,7 @@ class Game:
                 self.food = Food()
             
     def game_over(self):
-        global state
+        
         snake_length = len(self.snake.body)
         snake_head = self.snake.body[snake_length - 1]
         if (snake_head.x not in range(0, NB_COL)) or (snake_head.y not in range(0, NB_ROW)):
@@ -134,6 +136,9 @@ class Game:
                 file.close
                 time.sleep(1)
                 print("NOUVEAU RECORD :",self.snake.score,"!")
+                time.sleep(1.5)
+                pygame.quit()
+                sys.exit()
             else :
                 time.sleep(1)
                 print("Score :",self.snake.score)
@@ -141,7 +146,8 @@ class Game:
             self.snake.score = 0
             self.snake.body = [Block(2,6), Block(3,6), Block(4, 6)]
             self.snake.direction = "RIGHT"
-            state = "END"
+            ALIVE = False
+            
             
 
         for block in self.snake.body[0:snake_length - 1]:
@@ -152,14 +158,16 @@ class Game:
                     file.close
                     time.sleep(1)
                     print("NOUVEAU RECORD :",self.snake.score,"!")
+                    time.sleep(1.5)
+                    pygame.quit()
+                    sys.exit()
                 else :
                     time.sleep(1)
                     print("Score :",self.snake.score)
                 self.snake.score = 0
                 self.snake.body = [Block(2,6), Block(3,6), Block(4, 6)]
                 self.snake.direction = "RIGHT"
-                exec(open(score_path).read())
-                state = "END"
+                ALIVE = False
                 break
 
 pygame.init()
@@ -177,6 +185,7 @@ game_on = False
 game = Game()
 
 SCREEN_UPDATE = pygame.USEREVENT
+ALIVE = True
 pygame.time.set_timer(SCREEN_UPDATE, 400)
 
 def showGrid():
@@ -186,45 +195,54 @@ def showGrid():
             pygame.draw.rect(screen, (243, 243, 243), grille, width=1)
 
 while True:
-    while game_on:
-        if state == "END":
-            exec(open(score_path).read())
+    while ALIVE:
+        while game_on:    
             
+            for event in pygame.event.get():
+                if event.type == pygame.QUIT:
+                    pygame.quit()
+                    sys.exit()
+                    break
+                if event.type == SCREEN_UPDATE:
+                    game.update()
 
-        for event in pygame.event.get():
-            if event.type == pygame.QUIT:
-                pygame.quit()
-                sys.exit
-            if event.type == SCREEN_UPDATE:
-                game.update()
-            
-            if event.type == pygame.KEYDOWN:
-                if event.key == pygame.K_UP or event.key == pygame.K_z or event.key == pygame.K_w:
-                    if game.snake.direction != "DOWN":
-                        game.snake.direction = "TOP"
-                elif event.key == pygame.K_DOWN or event.key == pygame.K_s:
-                    if game.snake.direction != "TOP":
-                        game.snake.direction = "DOWN"
-                elif event.key == pygame.K_LEFT or event.key == pygame.K_q or event.key == pygame.K_a:
-                    if game.snake.direction != "RIGHT":
-                        game.snake.direction = "LEFT"
-                elif event.key == pygame.K_RIGHT or event.key == pygame.K_d:
-                    if game.snake.direction != "LEFT":
-                        game.snake.direction = "RIGHT"
-                elif event.key == pygame.K_SPACE:
-                    game_on = False
                 
+                
+                if event.type == pygame.KEYDOWN:
+                    if event.key == pygame.K_UP or event.key == pygame.K_z or event.key == pygame.K_w:
+                        if game.snake.direction != "DOWN":
+                            game.snake.direction = "TOP"
+                    elif event.key == pygame.K_DOWN or event.key == pygame.K_s:
+                        if game.snake.direction != "TOP":
+                            game.snake.direction = "DOWN"
+                    elif event.key == pygame.K_LEFT or event.key == pygame.K_q or event.key == pygame.K_a:
+                        if game.snake.direction != "RIGHT":
+                            game.snake.direction = "LEFT"
+                    elif event.key == pygame.K_RIGHT or event.key == pygame.K_d:
+                        if game.snake.direction != "LEFT":
+                            game.snake.direction = "RIGHT"
+                    elif event.key == pygame.K_SPACE:
+                        game_on = False
+                        
+                    
+        
+
+            if ALIVE == False:
+                game_on = None
+
+            screen.fill(pygame.Color('white'))
+            showGrid()
+            game.draw_game_element()
+            pygame.display.update()   
+            timer.tick(60)
 
 
+        while game_on == False:
+            for event in pygame.event.get():
+                if event.type == pygame.KEYDOWN:
+                    if event.key == pygame.K_SPACE:
+                        game_on = True
 
-        screen.fill(pygame.Color('white'))
-        showGrid()
-        game.draw_game_element()
-        pygame.display.update()   
-        timer.tick(60)
-
-    while game_on == False:
-        for event in pygame.event.get():
-            if event.type == pygame.KEYDOWN:
-                if event.key == pygame.K_SPACE:
-                    game_on = True
+        exec(open(score_path).read())
+        ALIVE
+        game_on
