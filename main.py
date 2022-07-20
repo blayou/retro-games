@@ -5,11 +5,14 @@ from random import randint
 import random
 import time
 import pygame
+import webbrowser
 
 state = "END"
 record = None
 gamesPath = str(pathlib.Path(__file__).parent.absolute())
 gamesPath = gamesPath.replace("\\",'/')
+pygame.mixer.init()
+foodSound = pygame.mixer.Sound(gamesPath + "/snake/sounds/food.wav")
 exec(open(gamesPath + "/snake/filessnake.py").read())
 
 score_path = str(pathlib.Path(__file__).parent.absolute()) + "\\snake\\filessnake.py"
@@ -181,6 +184,9 @@ def launchPong():
 def launchSnake():
     exec(open(gamesPath + "/snake/snake.py").read())
 
+def kevTwitter():
+    webbrowser.open("https://twitter.com/keveul")
+
 window = tkinter.Tk()
 window.title("Jeux rétro")
 window.geometry("1280x720")
@@ -209,6 +215,7 @@ snakeLabel = tkinter.Button(snakeText, text="Snake", font=("Helvetica", 20), fg 
 
 title = tkinter.Label(window, text="Launcher Retro Games", font=("Helvetica", 20), fg = "#F2F2F2", bg="#222222")
 
+keveul = tkinter.Button(window, text="Background Musics by Keveul", font=("Helvetica", 20), fg="#F2F2F2", bg="#222222", command=kevTwitter)
 
 title.pack()
 games.pack(expand=tkinter.YES)
@@ -223,6 +230,7 @@ pongLabel.pack(side="top")
 snakeCanvas.pack(expand=tkinter.YES, side="top", fill=tkinter.X)
 snakeText.pack(expand=tkinter.YES, side="bottom")
 snakeLabel.pack(side="top")
+keveul.pack(side="bottom")
 
 
 

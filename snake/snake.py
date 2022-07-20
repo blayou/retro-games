@@ -1,7 +1,4 @@
-#from doctest import NORMALIZE_WHITESPACE
-#from tkinter.tix import CELL
-#from token import TYPE_COMMENT
-from ast import Break
+
 import pygame
 import sys
 import random
@@ -12,8 +9,19 @@ import time
 
 record = None
 
-score_path = str(pathlib.Path(__file__).parent.absolute()) + "\\filessnake.py"
+pygame.init()
+pygame.mixer.init()
+
+
+
+score_path = str(pathlib.Path(__file__).parent.absolute()) + "\\snake\\filessnake.py"
 score_path = score_path.replace("\\",'/')
+sounds_path = str(pathlib.Path(__file__).parent.absolute()) + "\\snake\\sounds"
+sounds_path = sounds_path.replace("\\",'/')
+
+foodSound = pygame.mixer.Sound(sounds_path + "/food.wav")
+walkSound = pygame.mixer.Sound(sounds_path + "/walk.wav")
+walkSound.set_volume(0.7)
 
 exec(open(score_path).read())
 class Block:
@@ -108,6 +116,8 @@ class Game:
 
         if snake_head_block.x == food_block.x and snake_head_block.y == food_block.y:
             self.generate_food()
+            
+            foodSound.play()
             self.snake.score += 1
         else:
             self.snake.body.pop(0)
@@ -170,7 +180,16 @@ class Game:
                 ALIVE = False
                 break
 
-pygame.init()
+
+
+SOUND = True
+
+pygame.mixer.music.set_volume(0.15)
+pygame.mixer.music.load(sounds_path + "/intro.wav")
+pygame.mixer.music.play()
+pygame.mixer.music.queue(sounds_path + "/boucle.wav", loops=-1)
+
+pygame.mixer.music
 
 NB_COL = 10
 NB_ROW = 15
@@ -204,7 +223,9 @@ while True:
                     sys.exit()
                     break
                 if event.type == SCREEN_UPDATE:
+                    walkSound.play()
                     game.update()
+                    
 
                 
                 
@@ -223,8 +244,17 @@ while True:
                             game.snake.direction = "RIGHT"
                     elif event.key == pygame.K_SPACE:
                         game_on = False
-                        
+                    if event.key == pygame.K_m:
+                        if SOUND:
+                            pygame.mixer.music.pause()
+                            SOUND = False
+                        else:
+                            pygame.mixer.music.unpause()
+                            SOUND = True
                     
+
+                        
+                
         
 
             if ALIVE == False:
@@ -238,6 +268,9 @@ while True:
 
 
         while game_on == False:
+            if SOUND:
+                pygame.mixer.music.pause()
+                SOUND = False
             for event in pygame.event.get():
                 if event.type == pygame.KEYDOWN:
                     if event.key == pygame.K_SPACE:
@@ -245,4 +278,7 @@ while True:
 
         exec(open(score_path).read())
         ALIVE
+        if SOUND == False:
+            pygame.mixer.music.unpause()
+            SOUND = True
         game_on
